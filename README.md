@@ -57,7 +57,7 @@ Movies are rated based on user reviews, generating an overall rating that is dis
 
 * HTML5 for structuring web pages
 * CSS3 for styling and responsive design
-* JavaScript (ES6+) for client-side functionality, DOM manipulation, and API integration
+* JavaScript (ES6+) for client-side functionality and DOM manipulation
 
 ### Backend and Data Management
 
