@@ -61,5 +61,5 @@ Movies are rated based on user reviews, generating an overall rating that is dis
 
 ### Backend and Data Management
 
-* JSON Server for simulating a RESTful API and managing movie and review data
+* `localStgorage` for managing movie and review data
 * JSON for data storage and exchange
