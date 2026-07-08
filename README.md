@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Movie Review Web Application is a web-based platform that allows users to discover, review, and rate movies. It provides an interactive and user-friendly interface where movie enthusiasts can explore detailed movie information, share their opinions, and engage with reviews from other visitors.
+The Movie Review Web Application is a web-based platform that allows visitors to discover, review, and rate movies. It provides an interactive and user-friendly interface where movie enthusiasts can explore detailed movie information, share their opinions, and engage with reviews from other visitors.
 
 ## Features
 
