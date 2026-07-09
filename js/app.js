@@ -53,12 +53,6 @@ const movies = [
     genre: "Horror",
     poster: "assets/walkingdead.jpg"
 },
-{
-    id: 10,
-    title: "Barbie",
-    genre: "Fantasy",
-    poster: "assets/barbie.jpg"
-}
 ];
 localStorage.setItem("movies", JSON.stringify(movies));
 const storedMovies = JSON.parse(localStorage.getItem("movies"));
