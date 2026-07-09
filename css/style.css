@@ -1,0 +1,21 @@
+#movies-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.movie-card {
+    border: 1px solid #e08f8f;
+    border-radius: 10px;
+    padding: 15px;
+    text-align: center;
+}
+
+.movie-card img {
+    width: 100%;
+    height: 300px;
+    object-fit: cover;
+}
+h1{
+    text-align: center;
+}
