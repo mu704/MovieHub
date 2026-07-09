@@ -33,25 +33,31 @@ const movies = [
     id: 6,
     title: "Friends",
     genre: "Comedy",
-    poster: "assets/friends.jpg",
+    poster: "assets/friends.jpg"
 },
 {
     id: 7,
     title: "Game of Thrones",
     genre: "Fantasy",
-    poster: "assets/got.jpg",
+    poster: "assets/got.jpg"
 },
 {
     id: 8,
     title: "Teen Wolf",
     genre: "Fantasy",
-    poster: "assets/teenwolf.jpg",
+    poster: "assets/teenwolf.jpg"
 },
 {
     id: 9,
     title: "The Walking Dead",
     genre: "Horror",
-    poster: "assets/walkingdead.jpg",
+    poster: "assets/walkingdead.jpg"
+},
+{
+    id: 10,
+    title: "Barbie",
+    genre: "Fantasy",
+    poster: "assets/barbie.jpg"
 }
 ];
 localStorage.setItem("movies", JSON.stringify(movies));
