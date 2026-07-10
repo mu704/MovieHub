@@ -97,18 +97,40 @@ if (document.getElementById("movie-poster")) {
 }
 console.log(storedMovies);
 const moviesContainer = document.getElementById("movies-container");
+const searchInput = document.getElementById("search-input");
+
+function renderMovies(movies) {
+    moviesContainer.innerHTML = "";
+    if (movies.length === 0) {
+    moviesContainer.innerHTML = "<h2>No results found</h2>";
+    return;
+}
+
+    movies.forEach(movie => {
+        moviesContainer.innerHTML += `
+            <div class="movie-card">
+                <a href="moviedetails.html"
+                   onclick="localStorage.setItem('selectedMovie', ${movie.id})">
+                    <img src="${movie.poster}" alt="${movie.title}">
+                    <h2>${movie.title}</h2>
+                    <p>${movie.genre}</p>
+                </a>
+            </div>
+        `;
+    });
+}
 
 if (moviesContainer) {
-    storedMovies.forEach(movie => {
-    moviesContainer.innerHTML += `
-        <div class="movie-card">
-            <a href="moviedetails.html"
-            onclick="localStorage.setItem('selectedMovie', ${movie.id})">
-                <img src="${movie.poster}" alt="${movie.title}">
-                <h2>${movie.title}</h2>
-                <p>${movie.genre}</p>
-            </a>
-        </div>
-    `;
-});
+    renderMovies(storedMovies);
+}
+if (searchInput) {
+    searchInput.addEventListener("input", () => {
+        const searchTerm = searchInput.value.toLowerCase();
+
+        const filteredMovies = storedMovies.filter(movie =>
+            movie.title.toLowerCase().includes(searchTerm)
+        );
+
+        renderMovies(filteredMovies);
+    });
 }
