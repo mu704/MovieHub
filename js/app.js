@@ -81,7 +81,9 @@ const movies = [
     rating: "8.1/10"
 },
 ];
-localStorage.setItem("movies", JSON.stringify(movies));
+if (!localStorage.getItem("movies")) {
+    localStorage.setItem("movies", JSON.stringify(movies));
+}
 const storedMovies = JSON.parse(localStorage.getItem("movies"));
 const selectedMovieId = localStorage.getItem("selectedMovie");
 const selectedMovie = storedMovies.find(movie => movie.id == selectedMovieId);
@@ -96,7 +98,8 @@ if (document.getElementById("movie-poster")) {
 console.log(storedMovies);
 const moviesContainer = document.getElementById("movies-container");
 
-storedMovies.forEach(movie => {
+if (moviesContainer) {
+    storedMovies.forEach(movie => {
     moviesContainer.innerHTML += `
         <div class="movie-card">
             <a href="moviedetails.html"
@@ -108,3 +111,4 @@ storedMovies.forEach(movie => {
         </div>
     `;
 });
+}
