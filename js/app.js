@@ -98,6 +98,7 @@ if (document.getElementById("movie-poster")) {
 console.log(storedMovies);
 const moviesContainer = document.getElementById("movies-container");
 const searchInput = document.getElementById("search-input");
+const genreFilter = document.getElementById("genre-filter");
 
 function renderMovies(movies) {
     moviesContainer.innerHTML = "";
@@ -123,14 +124,24 @@ function renderMovies(movies) {
 if (moviesContainer) {
     renderMovies(storedMovies);
 }
-if (searchInput) {
-    searchInput.addEventListener("input", () => {
-        const searchTerm = searchInput.value.toLowerCase();
+function filterMovies() {
+    const searchTerm = searchInput.value.toLowerCase();
+    const selectedGenre = genreFilter.value;
 
-        const filteredMovies = storedMovies.filter(movie =>
-            movie.title.toLowerCase().includes(searchTerm)
-        );
+    const filteredMovies = storedMovies.filter(movie => {
+        const matchesSearch = movie.title.toLowerCase().includes(searchTerm);
+        const matchesGenre = selectedGenre === "" || movie.genre === selectedGenre;
 
-        renderMovies(filteredMovies);
+        return matchesSearch && matchesGenre;
     });
+
+    renderMovies(filteredMovies);
+}
+
+if (searchInput) {
+    searchInput.addEventListener("input", filterMovies);
+}
+
+if (genreFilter) {
+    genreFilter.addEventListener("change", filterMovies);
 }
