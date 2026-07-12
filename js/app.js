@@ -99,6 +99,7 @@ console.log(storedMovies);
 const moviesContainer = document.getElementById("movies-container");
 const searchInput = document.getElementById("search-input");
 const genreFilter = document.getElementById("genre-filter");
+const actorSearch = document.getElementById("actor-search");
 
 function renderMovies(movies) {
     moviesContainer.innerHTML = "";
@@ -127,12 +128,14 @@ if (moviesContainer) {
 function filterMovies() {
     const searchTerm = searchInput.value.toLowerCase();
     const selectedGenre = genreFilter.value;
+    const actorTerm = actorSearch.value.toLowerCase();
 
     const filteredMovies = storedMovies.filter(movie => {
         const matchesSearch = movie.title.toLowerCase().includes(searchTerm);
         const matchesGenre = selectedGenre === "" || movie.genre === selectedGenre;
+        const matchesActor = actorTerm === "" || movie.cast.toLowerCase().includes(actorTerm);
 
-        return matchesSearch && matchesGenre;
+        return matchesSearch && matchesGenre && matchesActor;
     });
 
     renderMovies(filteredMovies);
@@ -144,4 +147,7 @@ if (searchInput) {
 
 if (genreFilter) {
     genreFilter.addEventListener("change", filterMovies);
+}
+if (actorSearch) {
+    actorSearch.addEventListener("input", filterMovies);
 }
