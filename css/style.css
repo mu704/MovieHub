@@ -37,6 +37,9 @@ body{
 .movieinfo{
     display: flex;
     flex-direction: column;
-    gap: 15px;
-    font-size: 25px;
+    gap: 8px;
+    font-size: 20px;
+}
+.movieinfo p{
+    margin: 5px 0;
 }

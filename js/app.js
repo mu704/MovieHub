@@ -87,6 +87,26 @@ if (!localStorage.getItem("movies")) {
 const storedMovies = JSON.parse(localStorage.getItem("movies"));
 const selectedMovieId = localStorage.getItem("selectedMovie");
 const selectedMovie = storedMovies.find(movie => movie.id == selectedMovieId);
+const storedReviews = JSON.parse(localStorage.getItem("reviews")) || [];
+function renderReviews() {
+    if (!reviewsContainer) {
+        return;
+    }
+
+    reviewsContainer.innerHTML = "";
+
+    const movieReviews = storedReviews.filter(review =>
+        review.movieId == selectedMovieId
+    );
+
+    movieReviews.forEach(review => {
+        reviewsContainer.innerHTML += `
+            <p><strong>${review.rating}/10</strong> - ${review.comment}</p>
+        `;
+    });
+}
+
+
 if (document.getElementById("movie-poster")) {
     document.getElementById("movie-poster").src = selectedMovie.poster;
     document.getElementById("movie-title").textContent = "Title: " + selectedMovie.title;
@@ -100,6 +120,32 @@ const moviesContainer = document.getElementById("movies-container");
 const searchInput = document.getElementById("search-input");
 const genreFilter = document.getElementById("genre-filter");
 const actorSearch = document.getElementById("actor-search");
+const reviewsContainer = document.getElementById("reviews-container");
+const reviewForm = document.getElementById("review-form");
+const reviewRating = document.getElementById("review-rating");
+const reviewComment = document.getElementById("review-comment");
+if (reviewsContainer) {
+    renderReviews();
+}
+if (reviewForm) {
+    reviewForm.addEventListener("submit", (event) => {
+        event.preventDefault();
+
+        const review = {
+            movieId: selectedMovieId,
+            rating: reviewRating.value,
+            comment: reviewComment.value
+        };
+
+        storedReviews.push(review);
+
+        localStorage.setItem("reviews", JSON.stringify(storedReviews));
+
+        renderReviews();
+
+        reviewForm.reset();
+    });
+}
 
 function renderMovies(movies) {
     moviesContainer.innerHTML = "";
