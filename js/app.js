@@ -216,3 +216,26 @@ if (genreFilter) {
 if (actorSearch) {
     actorSearch.addEventListener("input", filterMovies);
 }
+
+
+const registerForm = document.getElementById("register-form");
+
+if (registerForm) {
+    registerForm.addEventListener("submit", (event) => {
+        event.preventDefault();
+
+        const username = document.getElementById("register-username").value;
+        const password = document.getElementById("register-password").value;
+
+        const user = {
+            username: username,
+            password: password
+        };
+
+        localStorage.setItem("user", JSON.stringify(user));
+
+        alert("Registration successful!");
+
+        registerForm.reset();
+    });
+}
