@@ -227,15 +227,43 @@ if (registerForm) {
         const username = document.getElementById("register-username").value;
         const password = document.getElementById("register-password").value;
 
-        const user = {
+        const users = JSON.parse(localStorage.getItem("users")) || [];
+        users.push({
             username: username,
             password: password
-        };
+});
 
-        localStorage.setItem("user", JSON.stringify(user));
+localStorage.setItem("users", JSON.stringify(users));
 
         alert("Registration successful!");
 
         registerForm.reset();
+    });
+}
+const loginForm = document.getElementById("login-form");
+
+if (loginForm) {
+    loginForm.addEventListener("submit", (event) => {
+        event.preventDefault();
+
+        const username = document.getElementById("login-username").value;
+        const password = document.getElementById("login-password").value;
+
+        const users = JSON.parse(localStorage.getItem("users")) || [];
+
+        const user = users.find(user =>
+            user.username === username &&
+            user.password === password
+        );
+
+        if (user) {
+            localStorage.setItem("currentUser", JSON.stringify(user));
+
+            alert("Login successful!");
+
+            window.location.href = "movie.html";
+        } else {
+            alert("Invalid username or password!");
+        }
     });
 }
