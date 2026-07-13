@@ -87,11 +87,14 @@ if (!localStorage.getItem("movies")) {
 const storedMovies = JSON.parse(localStorage.getItem("movies"));
 const selectedMovieId = localStorage.getItem("selectedMovie");
 const selectedMovie = storedMovies.find(movie => movie.id == selectedMovieId);
-const storedReviews = JSON.parse(localStorage.getItem("reviews")) || [];
-function renderReviews() {
+let storedReviews = [];
+async function renderReviews() {
     if (!reviewsContainer) {
         return;
     }
+
+    const response = await fetch("http://localhost:3000/reviews");
+    storedReviews = await response.json();
 
     reviewsContainer.innerHTML = "";
 
@@ -104,6 +107,15 @@ function renderReviews() {
             <p><strong>${review.rating}/10</strong> - ${review.comment}</p>
         `;
     });
+    if (movieReviews.length > 0) {
+    const total = movieReviews.reduce((sum, review) => sum + Number(review.rating), 0);
+
+    const average = total / movieReviews.length;
+
+    averageRating.textContent = "Average rating: " + average.toFixed(1) + "/10";
+} else {
+    averageRating.textContent = "Average rating: No reviews";
+}
 }
 
 
@@ -124,11 +136,13 @@ const reviewsContainer = document.getElementById("reviews-container");
 const reviewForm = document.getElementById("review-form");
 const reviewRating = document.getElementById("review-rating");
 const reviewComment = document.getElementById("review-comment");
+const averageRating = document.getElementById("average-rating");
 if (reviewsContainer) {
     renderReviews();
 }
+
 if (reviewForm) {
-    reviewForm.addEventListener("submit", (event) => {
+    reviewForm.addEventListener("submit", async (event) => {
         event.preventDefault();
 
         const review = {
@@ -137,15 +151,20 @@ if (reviewForm) {
             comment: reviewComment.value
         };
 
-        storedReviews.push(review);
-
-        localStorage.setItem("reviews", JSON.stringify(storedReviews));
+        await fetch("http://localhost:3000/reviews", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(review)
+        });
 
         renderReviews();
 
         reviewForm.reset();
     });
 }
+
 
 function renderMovies(movies) {
     moviesContainer.innerHTML = "";

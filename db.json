@@ -1,0 +1,11 @@
+{
+  "reviews": [
+    {
+      "movieId": "1",
+      "rating": "7",
+      "comment": "Good",
+      "id": "GF58Si__1fs"
+    }
+  ],
+  "$schema": "./node_modules/json-server/schema.json"
+}
