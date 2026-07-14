@@ -330,3 +330,42 @@ if (favoriteMovies) {
         `;
     });
 }
+const logoutBtn = document.getElementById("logout-btn");
+
+if (logoutBtn) {
+    logoutBtn.addEventListener("click", () => {
+
+        localStorage.removeItem("currentUser");
+
+        window.location.href = "login.html";
+
+    });
+}
+const updateForm = document.getElementById("update-form");
+
+if (updateForm) {
+    console.log("Update form found");
+    updateForm.addEventListener("submit", (event) => {
+        event.preventDefault();
+
+        const newUsername = document.getElementById("new-username").value;
+        const newEmail = document.getElementById("new-email").value;
+
+        const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+        const users = JSON.parse(localStorage.getItem("users")) || [];
+
+        const user = users.find(user => user.username === currentUser.username);
+
+        if (user) {
+            user.username = newUsername;
+            user.email = newEmail;
+
+            localStorage.setItem("users", JSON.stringify(users));
+            localStorage.setItem("currentUser", JSON.stringify(user));
+
+            alert("Profile updated!");
+
+            window.location.reload();
+        }
+    });
+}
