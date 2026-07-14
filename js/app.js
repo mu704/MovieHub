@@ -242,3 +242,130 @@ localStorage.setItem("users", JSON.stringify(users));
         registerForm.reset();
     });
 }
+const loginForm = document.getElementById("login-form");
+
+if (loginForm) {
+    loginForm.addEventListener("submit", (event) => {
+        event.preventDefault();
+
+        const username = document.getElementById("login-username").value;
+        const password = document.getElementById("login-password").value;
+
+        const users = JSON.parse(localStorage.getItem("users")) || [];
+
+        const user = users.find(user =>
+            user.username === username &&
+            user.password === password
+        );
+
+        if (user) {
+            localStorage.setItem("currentUser", JSON.stringify(user));
+
+            alert("Login successful!");
+
+            window.location.href = "movie.html";
+        } else {
+            alert("Invalid username or password!");
+        }
+    });
+}
+const profileUsername = document.getElementById("profile-username");
+
+if (profileUsername) {
+    const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+
+    if (currentUser) {
+        profileUsername.textContent = "Username: " + currentUser.username;
+    }
+}
+const userReviews = document.getElementById("user-reviews");
+
+if (userReviews) {
+    const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+
+    fetch("http://localhost:3000/reviews")
+        .then(response => response.json())
+        .then(reviews => {
+
+            const myReviews = reviews.filter(review =>
+                review.username === currentUser.username
+            );
+
+            myReviews.forEach(review => {
+                userReviews.innerHTML += `
+                    <p><strong>${review.rating}/10</strong> - ${review.comment}</p>
+                `;
+            });
+
+        });
+}
+const favoriteBtn = document.getElementById("favorite-btn");
+
+if (favoriteBtn) {
+    favoriteBtn.addEventListener("click", () => {
+
+        const favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+
+        const alreadyAdded = favorites.find(movie => movie.id == selectedMovie.id);
+
+        if (!alreadyAdded) {
+            favorites.push(selectedMovie);
+            localStorage.setItem("favorites", JSON.stringify(favorites));
+
+            alert("Movie added to favorites!");
+        } else {
+            alert("Movie is already in favorites!");
+        }
+
+    });
+}
+const favoriteMovies = document.getElementById("favorite-movies");
+
+if (favoriteMovies) {
+    const favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+
+    favorites.forEach(movie => {
+        favoriteMovies.innerHTML += `
+            <p>${movie.title}</p>
+        `;
+    });
+}
+const logoutBtn = document.getElementById("logout-btn");
+
+if (logoutBtn) {
+    logoutBtn.addEventListener("click", () => {
+
+        localStorage.removeItem("currentUser");
+
+        window.location.href = "login.html";
+
+    });
+}
+const updateForm = document.getElementById("update-form");
+
+if (updateForm) {
+    console.log("Update form found");
+    updateForm.addEventListener("submit", (event) => {
+        event.preventDefault();
+
+        const newUsername = document.getElementById("new-username").value;
+        const newEmail = document.getElementById("new-email").value;
+
+        const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+        const users = JSON.parse(localStorage.getItem("users")) || [];
+
+        const user = users.find(user => user.username === currentUser.username);
+
+        if (user) {
+            user.username = newUsername;
+            user.email = newEmail;
+
+            localStorage.setItem("users", JSON.stringify(users));
+            localStorage.setItem("currentUser", JSON.stringify(user));
+
+            alert("Profile updated!");
+
+            window.location.reload();
+        }
+    });
+}
