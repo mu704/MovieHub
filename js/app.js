@@ -407,3 +407,39 @@ if (updateForm) {
         }
     });
 }
+const favoritesContainer = document.getElementById("favorites-container");
+
+if (favoritesContainer) {
+
+    const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+
+    fetch("http://localhost:3000/favorites")
+    .then(response => response.json())
+    .then(favorites => {
+
+        const myFavorites = favorites.filter(favorite =>
+            favorite.username === currentUser.username
+        );
+
+        myFavorites.forEach(favorite => {
+
+            const movie = storedMovies.find(movie =>
+                movie.id == favorite.movieId
+            );
+
+            favoritesContainer.innerHTML += `
+                <div class="movie-card">
+                    <a href="moviedetails.html"
+                       onclick="localStorage.setItem('selectedMovie', ${movie.id})">
+                        <img src="${movie.poster}" alt="${movie.title}" width="150">
+                        <h2>${movie.title}</h2>
+                        <p>${movie.genre}</p>
+                    </a>
+                </div>
+            `;
+
+        });
+
+    });
+
+}
