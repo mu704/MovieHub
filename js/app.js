@@ -239,3 +239,76 @@ if (registerForm) {
         registerForm.reset();
     });
 }
+
+
+const favoriteButton = document.getElementById("favorite-button");
+
+if (favoriteButton) {
+
+    const user = JSON.parse(localStorage.getItem("user"));
+
+    fetch("http://localhost:3000/favorites")
+        .then(response => response.json())
+        .then(favorites => {
+
+            const existingFavorite = favorites.find(favorite =>
+                favorite.movieId == selectedMovieId &&
+                favorite.username == user.username
+            );
+
+            if (existingFavorite) {
+                favoriteButton.textContent = "Remove from Favorites";
+            } else {
+                favoriteButton.textContent = "Add to Favorites";
+            }
+
+        });
+
+}
+if (favoriteButton) {
+
+    favoriteButton.addEventListener("click", async () => {
+
+        const user = JSON.parse(localStorage.getItem("user"));
+
+        const response = await fetch("http://localhost:3000/favorites");
+        const favorites = await response.json();
+
+        const existingFavorite = favorites.find(favorite =>
+            favorite.movieId == selectedMovieId &&
+            favorite.username == user.username
+        );
+
+        if (existingFavorite) {
+
+            await fetch(`http://localhost:3000/favorites/${existingFavorite.id}`, {
+                method: "DELETE"
+            });
+
+            favoriteButton.textContent = "Add to Favorites";
+
+            alert("Movie removed from favorites!");
+
+        } else {
+
+            const favorite = {
+                movieId: selectedMovieId,
+                username: user.username
+            };
+
+            await fetch("http://localhost:3000/favorites", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(favorite)
+            });
+
+            favoriteButton.textContent = "Remove from Favorites";
+
+            alert("Movie added to favorites!");
+        }
+
+    });
+
+}
