@@ -14,8 +14,13 @@
       "id": "stYz1WQXtTc"
     }
   ],
-  
-  "favorites": [],
-
+  "favorites": [
+    {
+      "username": "Mert",
+      "movieId": 1,
+      "title": "Peaky Blinders",
+      "id": "ur6PlFMM-5w"
+    }
+  ],
   "$schema": "./node_modules/json-server/schema.json"
 }

@@ -304,30 +304,68 @@ const favoriteBtn = document.getElementById("favorite-btn");
 if (favoriteBtn) {
     favoriteBtn.addEventListener("click", () => {
 
-        const favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+        const currentUser = JSON.parse(localStorage.getItem("currentUser"));
 
-        const alreadyAdded = favorites.find(movie => movie.id == selectedMovie.id);
+        fetch("http://localhost:3000/favorites")
+        .then(response => response.json())
+        .then(favorites => {
 
-        if (!alreadyAdded) {
-            favorites.push(selectedMovie);
-            localStorage.setItem("favorites", JSON.stringify(favorites));
+            const favorite = favorites.find(f =>
+                f.username === currentUser.username &&
+                f.movieId == selectedMovie.id
+            );
 
-            alert("Movie added to favorites!");
-        } else {
-            alert("Movie is already in favorites!");
-        }
+            if (favorite) {
+
+                fetch(`http://localhost:3000/favorites/${favorite.id}`, {
+                    method: "DELETE"
+                })
+                .then(() => {
+                    alert("Movie removed from favorites!");
+                });
+
+            } else {
+
+                fetch("http://localhost:3000/favorites", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        username: currentUser.username,
+                        movieId: selectedMovie.id,
+                        title: selectedMovie.title
+                    })
+                })
+                .then(() => {
+                    alert("Movie added to favorites!");
+                });
+
+            }
+
+        });
 
     });
 }
 const favoriteMovies = document.getElementById("favorite-movies");
 
 if (favoriteMovies) {
-    const favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+    fetch("http://localhost:3000/favorites")
+    .then(response => response.json())
+    .then(favorites => {
 
-    favorites.forEach(movie => {
-        favoriteMovies.innerHTML += `
-            <p>${movie.title}</p>
-        `;
+        const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+
+        const myFavorites = favorites.filter(favorite =>
+            favorite.username === currentUser.username
+        );
+
+        myFavorites.forEach(movie => {
+            favoriteMovies.innerHTML += `
+                <p>${movie.title}</p>
+            `;
+        });
+
     });
 }
 const logoutBtn = document.getElementById("logout-btn");
