@@ -81,51 +81,57 @@ const movies = [
     rating: "8.1/10"
 },
 ];
-if (!localStorage.getItem("movies")) {
+if (!localStorage.getItem("movies") && typeof movies !== "undefined") {
     localStorage.setItem("movies", JSON.stringify(movies));
 }
-const storedMovies = JSON.parse(localStorage.getItem("movies"));
+const storedMovies = JSON.parse(localStorage.getItem("movies")) || [];
 const selectedMovieId = localStorage.getItem("selectedMovie");
 const selectedMovie = storedMovies.find(movie => movie.id == selectedMovieId);
 let storedReviews = [];
+
 async function renderReviews() {
     if (!reviewsContainer) {
         return;
     }
 
-    const response = await fetch("http://localhost:3000/reviews");
-    storedReviews = await response.json();
+    storedReviews = JSON.parse(localStorage.getItem("reviews")) || [];
 
-    reviewsContainer.innerHTML = "";
+    reviewsContainer.textContent = "";
 
     const movieReviews = storedReviews.filter(review =>
         review.movieId == selectedMovieId
     );
 
     movieReviews.forEach(review => {
-        reviewsContainer.innerHTML += `
-            <p><strong>${review.rating}/10</strong> - ${review.comment}</p>
-        `;
+        const p = document.createElement("p");
+        const strong = document.createElement("strong");
+        strong.textContent = `${review.rating}/10`;
+        p.appendChild(strong);
+        p.append(` - ${review.comment}`);
+        reviewsContainer.appendChild(p);
     });
+
     if (movieReviews.length > 0) {
-    const total = movieReviews.reduce((sum, review) => sum + Number(review.rating), 0);
-
-    const average = total / movieReviews.length;
-
-    averageRating.textContent = "Average rating: " + average.toFixed(1) + "/10";
-} else {
-    averageRating.textContent = "Average rating: No reviews";
-}
+        const total = movieReviews.reduce((sum, review) => sum + Number(review.rating), 0);
+        const average = total / movieReviews.length;
+        averageRating.textContent = "Average rating: " + average.toFixed(1) + "/10";
+    } else {
+        averageRating.textContent = "Average rating: No reviews";
+    }
 }
 
 
 if (document.getElementById("movie-poster")) {
-    document.getElementById("movie-poster").src = selectedMovie.poster;
-    document.getElementById("movie-title").textContent = "Title: " + selectedMovie.title;
-    document.getElementById("movie-genre").textContent = "Genre: " + selectedMovie.genre;
-    document.getElementById("movie-cast").textContent = "Cast: " + selectedMovie.cast;
-    document.getElementById("movie-plot").textContent = "Plot: " + selectedMovie.plot;
-    document.getElementById("movie-rating").textContent = "Rating: " + selectedMovie.rating;
+    if (selectedMovie) {
+        document.getElementById("movie-poster").src = selectedMovie.poster;
+        document.getElementById("movie-title").textContent = "Title: " + selectedMovie.title;
+        document.getElementById("movie-genre").textContent = "Genre: " + selectedMovie.genre;
+        document.getElementById("movie-cast").textContent = "Cast: " + selectedMovie.cast;
+        document.getElementById("movie-plot").textContent = "Plot: " + selectedMovie.plot;
+        document.getElementById("movie-rating").textContent = "Rating: " + selectedMovie.rating;
+    } else {
+        console.error("No selected movie found!");
+    }
 }
 
 const moviesContainer = document.getElementById("movies-container");
@@ -137,6 +143,7 @@ const reviewForm = document.getElementById("review-form");
 const reviewRating = document.getElementById("review-rating");
 const reviewComment = document.getElementById("review-comment");
 const averageRating = document.getElementById("average-rating");
+
 if (reviewsContainer) {
     renderReviews();
 }
@@ -146,6 +153,11 @@ if (reviewForm) {
         event.preventDefault();
         
         const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+        if (!currentUser) {
+            alert("Please log in to submit a review!");
+            return;
+        }
+
         const review = {
              movieId: selectedMovieId,
              username: currentUser.username,
@@ -153,13 +165,9 @@ if (reviewForm) {
              comment: reviewComment.value
         };
 
-        await fetch("http://localhost:3000/reviews", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(review)
-        });
+        const reviews = JSON.parse(localStorage.getItem("reviews")) || [];
+        reviews.push(review);
+        localStorage.setItem("reviews", JSON.stringify(reviews));
 
         renderReviews();
 
@@ -169,29 +177,48 @@ if (reviewForm) {
 
 
 function renderMovies(movies) {
-    moviesContainer.innerHTML = "";
+    moviesContainer.textContent = "";
+    
     if (movies.length === 0) {
-    moviesContainer.innerHTML = "<h2>No results found</h2>";
-    return;
-}
+        const noResults = document.createElement("h2");
+        noResults.textContent = "No results found";
+        moviesContainer.appendChild(noResults);
+        return;
+    }
 
     movies.forEach(movie => {
-        moviesContainer.innerHTML += `
-            <div class="movie-card">
-                <a href="moviedetails.html"
-                   onclick="localStorage.setItem('selectedMovie', ${movie.id})">
-                    <img src="${movie.poster}" alt="${movie.title}">
-                    <h2>${movie.title}</h2>
-                    <p>${movie.genre}</p>
-                </a>
-            </div>
-        `;
+        const card = document.createElement("div");
+        card.className = "movie-card";
+
+        const link = document.createElement("a");
+        link.href = "moviedetails.html";
+        link.addEventListener("click", () => {
+            localStorage.setItem('selectedMovie', movie.id);
+        });
+
+        const img = document.createElement("img");
+        img.src = movie.poster;
+        img.alt = movie.title;
+
+        const title = document.createElement("h2");
+        title.textContent = movie.title;
+
+        const genre = document.createElement("p");
+        genre.textContent = movie.genre;
+
+        link.appendChild(img);
+        link.appendChild(title);
+        link.appendChild(genre);
+        card.appendChild(link);
+        
+        moviesContainer.appendChild(card);
     });
 }
 
 if (moviesContainer) {
     renderMovies(storedMovies);
 }
+
 function filterMovies() {
     const searchTerm = searchInput.value.toLowerCase();
     const selectedGenre = genreFilter.value;
@@ -215,6 +242,7 @@ if (searchInput) {
 if (genreFilter) {
     genreFilter.addEventListener("change", filterMovies);
 }
+
 if (actorSearch) {
     actorSearch.addEventListener("input", filterMovies);
 }
@@ -233,15 +261,16 @@ if (registerForm) {
         users.push({
             username: username,
             password: password
-});
+        });
 
-localStorage.setItem("users", JSON.stringify(users));
+        localStorage.setItem("users", JSON.stringify(users));
 
         alert("Registration successful!");
 
         registerForm.reset();
     });
 }
+
 const loginForm = document.getElementById("login-form");
 
 if (loginForm) {
@@ -269,6 +298,7 @@ if (loginForm) {
         }
     });
 }
+
 const profileUsername = document.getElementById("profile-username");
 
 if (profileUsername) {
@@ -278,96 +308,90 @@ if (profileUsername) {
         profileUsername.textContent = "Username: " + currentUser.username;
     }
 }
+
 const userReviews = document.getElementById("user-reviews");
 
 if (userReviews) {
     const currentUser = JSON.parse(localStorage.getItem("currentUser"));
 
-    fetch("http://localhost:3000/reviews")
-        .then(response => response.json())
-        .then(reviews => {
+    if (currentUser) {
+        const reviews = JSON.parse(localStorage.getItem("reviews")) || [];
 
-            const myReviews = reviews.filter(review =>
-                review.username === currentUser.username
-            );
+        const myReviews = reviews.filter(review =>
+            review.username === currentUser.username
+        );
 
-            myReviews.forEach(review => {
-                userReviews.innerHTML += `
-                    <p><strong>${review.rating}/10</strong> - ${review.comment}</p>
-                `;
-            });
-
+        userReviews.textContent = "";
+        
+        myReviews.forEach(review => {
+            const p = document.createElement("p");
+            const strong = document.createElement("strong");
+            strong.textContent = `${review.rating}/10`;
+            p.appendChild(strong);
+            p.append(` - ${review.comment}`);
+            userReviews.appendChild(p);
         });
+    }
 }
+
 const favoriteBtn = document.getElementById("favorite-btn");
 
 if (favoriteBtn) {
     favoriteBtn.addEventListener("click", () => {
 
         const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+        if (!currentUser) {
+            alert("Please log in to manage favorites!");
+            return;
+        }
+        if (!selectedMovie) return;
 
-        fetch("http://localhost:3000/favorites")
-        .then(response => response.json())
-        .then(favorites => {
+        let favorites = JSON.parse(localStorage.getItem("favorites")) || [];
 
-            const favorite = favorites.find(f =>
-                f.username === currentUser.username &&
-                f.movieId == selectedMovie.id
-            );
+        const favoriteIndex = favorites.findIndex(f =>
+            f.username === currentUser.username &&
+            f.movieId == selectedMovie.id
+        );
 
-            if (favorite) {
-
-                fetch(`http://localhost:3000/favorites/${favorite.id}`, {
-                    method: "DELETE"
-                })
-                .then(() => {
-                    alert("Movie removed from favorites!");
-                });
-
-            } else {
-
-                fetch("http://localhost:3000/favorites", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({
-                        username: currentUser.username,
-                        movieId: selectedMovie.id,
-                        title: selectedMovie.title
-                    })
-                })
-                .then(() => {
-                    alert("Movie added to favorites!");
-                });
-
-            }
-
-        });
+        if (favoriteIndex > -1) {
+            favorites.splice(favoriteIndex, 1);
+            localStorage.setItem("favorites", JSON.stringify(favorites));
+            alert("Movie removed from favorites!");
+        } else {
+            favorites.push({
+                username: currentUser.username,
+                movieId: selectedMovie.id,
+                title: selectedMovie.title
+            });
+            localStorage.setItem("favorites", JSON.stringify(favorites));
+            alert("Movie added to favorites!");
+        }
 
     });
 }
+
 const favoriteMovies = document.getElementById("favorite-movies");
 
 if (favoriteMovies) {
-    fetch("http://localhost:3000/favorites")
-    .then(response => response.json())
-    .then(favorites => {
-
-        const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+    const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+    
+    if (currentUser) {
+        const favorites = JSON.parse(localStorage.getItem("favorites")) || [];
 
         const myFavorites = favorites.filter(favorite =>
             favorite.username === currentUser.username
         );
 
+        favoriteMovies.textContent = ""; 
+        
         myFavorites.forEach(movie => {
-            favoriteMovies.innerHTML += `
-                <p>${movie.title}</p>
-            `;
+            const p = document.createElement("p");
+            p.textContent = movie.title;
+            favoriteMovies.appendChild(p);
         });
-
-    });
+    }
 }
+
 const logoutBtn = document.getElementById("logout-btn");
 
 if (logoutBtn) {
@@ -379,6 +403,7 @@ if (logoutBtn) {
 
     });
 }
+
 const updateForm = document.getElementById("update-form");
 
 if (updateForm) {
@@ -392,14 +417,30 @@ if (updateForm) {
         const currentUser = JSON.parse(localStorage.getItem("currentUser"));
         const users = JSON.parse(localStorage.getItem("users")) || [];
 
-        const user = users.find(user => user.username === currentUser.username);
+        const userIndex = users.findIndex(user => user.username === currentUser.username);
 
-        if (user) {
-            user.username = newUsername;
-            user.email = newEmail;
+        if (userIndex > -1) {
+            const oldUsername = users[userIndex].username;
+
+            users[userIndex].username = newUsername;
+            users[userIndex].email = newEmail;
 
             localStorage.setItem("users", JSON.stringify(users));
-            localStorage.setItem("currentUser", JSON.stringify(user));
+            localStorage.setItem("currentUser", JSON.stringify(users[userIndex]));
+
+            let reviews = JSON.parse(localStorage.getItem("reviews")) || [];
+            reviews = reviews.map(r => {
+                if (r.username === oldUsername) r.username = newUsername;
+                return r;
+            });
+            localStorage.setItem("reviews", JSON.stringify(reviews));
+
+            let favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+            favorites = favorites.map(f => {
+                if (f.username === oldUsername) f.username = newUsername;
+                return f;
+            });
+            localStorage.setItem("favorites", JSON.stringify(favorites));
 
             alert("Profile updated!");
 
@@ -407,19 +448,21 @@ if (updateForm) {
         }
     });
 }
+
 const favoritesContainer = document.getElementById("favorites-container");
 
 if (favoritesContainer) {
 
     const currentUser = JSON.parse(localStorage.getItem("currentUser"));
 
-    fetch("http://localhost:3000/favorites")
-    .then(response => response.json())
-    .then(favorites => {
+    if (currentUser) {
+        const favorites = JSON.parse(localStorage.getItem("favorites")) || [];
 
         const myFavorites = favorites.filter(favorite =>
             favorite.username === currentUser.username
         );
+
+        favoritesContainer.textContent = ""; 
 
         myFavorites.forEach(favorite => {
 
@@ -427,19 +470,34 @@ if (favoritesContainer) {
                 movie.id == favorite.movieId
             );
 
-            favoritesContainer.innerHTML += `
-                <div class="movie-card">
-                    <a href="moviedetails.html"
-                       onclick="localStorage.setItem('selectedMovie', ${movie.id})">
-                        <img src="${movie.poster}" alt="${movie.title}" width="150">
-                        <h2>${movie.title}</h2>
-                        <p>${movie.genre}</p>
-                    </a>
-                </div>
-            `;
+            if (!movie) return;
 
+            const card = document.createElement("div");
+            card.className = "movie-card";
+
+            const link = document.createElement("a");
+            link.href = "moviedetails.html";
+            link.addEventListener("click", () => {
+                localStorage.setItem('selectedMovie', movie.id);
+            });
+
+            const img = document.createElement("img");
+            img.src = movie.poster;
+            img.alt = movie.title;
+            img.width = 150;
+
+            const title = document.createElement("h2");
+            title.textContent = movie.title;
+
+            const genre = document.createElement("p");
+            genre.textContent = movie.genre;
+
+            link.appendChild(img);
+            link.appendChild(title);
+            link.appendChild(genre);
+            card.appendChild(link);
+            
+            favoritesContainer.appendChild(card);
         });
-
-    });
-
+    }
 }
