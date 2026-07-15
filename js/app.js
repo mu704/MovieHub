@@ -127,7 +127,7 @@ if (document.getElementById("movie-poster")) {
     document.getElementById("movie-plot").textContent = "Plot: " + selectedMovie.plot;
     document.getElementById("movie-rating").textContent = "Rating: " + selectedMovie.rating;
 }
-console.log(storedMovies);
+
 const moviesContainer = document.getElementById("movies-container");
 const searchInput = document.getElementById("search-input");
 const genreFilter = document.getElementById("genre-filter");
