@@ -43,3 +43,35 @@ body{
 .movieinfo p{
     margin: 5px 0;
 }
+header {
+    background-color: #ff00ea20;
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 0 0 10px 10px;
+}
+
+.main-nav {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+}
+
+.nav-item {
+    color: rgba(55, 0, 46, 0.831);
+    text-decoration: none;
+    font-size: 18px;
+    font-weight: bold;
+    padding: 8px 16px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.nav-item:hover {
+    background-color: rgb(73, 0, 53);
+    color: #ff0095; 
+}
+
+.nav-item.active {
+    background-color: #ff00663c; 
+    color: #111;
+}

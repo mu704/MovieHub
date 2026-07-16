@@ -501,3 +501,45 @@ if (favoritesContainer) {
         });
     }
 }
+const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+const currentPage = window.location.pathname.split("/").pop();
+
+if ((currentPage === "profile.html" || currentPage === "moviedetails.html" || currentPage === "favorites.html") && !currentUser) {
+    alert("Please log in to access this page!");
+    window.location.href = "login.html";
+}
+
+function renderNavigation() {
+    let header = document.querySelector("header");
+    if (!header) {
+        header = document.createElement("header");
+        document.body.insertBefore(header, document.body.firstChild);
+    }
+
+    const nav = document.createElement("nav");
+    nav.className = "main-nav";
+
+    const links = [
+        { text: "Home", href: "movie.html" },
+        { text: "Profile", href: "profile.html" },
+        { text: "Favorites", href: "favorites.html" }
+    ];
+
+    links.forEach(item => {
+        const a = document.createElement("a");
+        a.textContent = item.text;
+        a.href = item.href;
+        a.className = "nav-item";
+
+        if (currentPage === item.href) {
+            a.classList.add("active");
+        }
+
+        nav.appendChild(a);
+    });
+
+    header.textContent = "";
+    header.appendChild(nav);
+}
+
+document.addEventListener("DOMContentLoaded", renderNavigation);
